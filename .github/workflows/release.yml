@@ -1,4 +1,4 @@
-name: Publish Rapidsec Node.js Package to Github
+name: Publish Rapidsec express-csp-generator Package to Github
 on:
   release:
     types: [created]
