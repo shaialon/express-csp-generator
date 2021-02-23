@@ -9,7 +9,7 @@ This middleware helps set Content Security Policies.
 Basic usage:
 
 ```javascript
-const contentSecurityPolicy = require("helmet-csp");
+const contentSecurityPolicy = require("express-csp-generator");
 
 app.use(
   contentSecurityPolicy({
