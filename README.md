@@ -1,70 +1,83 @@
-# Content Security Policy middleware
+# Content Security Policy Generator, Powered by [RapidSec](https://rapidsec.com)
 
-Content Security Policy (CSP) helps prevent unwanted content from being injected/loaded into your webpages. This can mitigate cross-site scripting (XSS) vulnerabilities, clickjacking, formjacking, malicious frames, unwanted trackers, and other web client-side attacks.
+Content Security Policy (CSP) helps prevent unwanted content from being injected/loaded into your webpages. This can mitigate cross-site scripting (XSS) vulnerabilities, Clickjacking, formajacking, malicious frames, unwanted trackers, client-side injected malware, and other [web client-side attacks](https://rapidsec.com/docs/client-side-attacks).
 
-If you want to learn how CSP works, check out the fantastic [HTML5 Rocks guide](http://www.html5rocks.com/en/tutorials/security/content-security-policy/), the [Content Security Policy Reference](http://content-security-policy.com/), and the [Content Security Policy specification](http://www.w3.org/TR/CSP/).
+## Getting started with CSP - create your report-uri and first CSP on RapidSec
+Go to [RapidSec and generate your first CSP](https://rapidsec.com/csp-automation).
+Choose a JSON export, that works with this specific express middleware.<br/>
+You could otherwise use the [RapidSec Node.js MicroAgent](https://www.npmjs.com/package/@rapidsec/node) which is even more automatic.
 
-This middleware helps set Content Security Policies.
+<img src="https://user-images.githubusercontent.com/3126207/109227014-50575f80-77c8-11eb-97d7-3cdacf183c3d.gif" width="700"/>
 
-Basic usage:
+## Install this package in your Express project
+`npm install express-csp-generator`
+or
+`yarn add express-csp-generator`
+
+## Add the report-only policy that you generated on RapidSec to send sends violation data to the report-uri:
 
 ```javascript
 const contentSecurityPolicy = require("express-csp-generator");
 
 app.use(
   contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'", "default.example"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
-    },
-    reportOnly: false,
-  })
+  "directives": {
+    "frame-ancestors": ["'none'"],
+    "block-all-mixed-content": [],
+    "default-src": ["'none'"],
+    "script-src": ["'self'","'report-sample'"],
+    "style-src": ["'self'","'report-sample'"],
+    "object-src": ["'none'"],
+    "frame-src": ["'none'"],
+    "child-src": ["'none'"],
+    "img-src": ["'self'"],
+    "font-src": ["'self'"],
+    "connect-src": ["'none'"],
+    "manifest-src": ["'none'"],
+    "base-uri": ["'self'"],
+    "form-action": ["'none'"],
+    "media-src": ["'none'"],
+    "prefetch-src": ["'none'"],
+    "worker-src": ["'none'"],
+    "report-uri": ["https://gate.rapidsec.net/YOUR_SPECIFIC_RAPIDSEC_ENDPOINT"]
+  },
+  "reportOnly": true
+})
 );
 ```
 
-To get the defaults, use `contentSecurityPolicy.getDefaultDirectives()`.
+## Now visit your local/ deployed site
+You should see "Report-Only" CSP violations in your browser.
+See example from Google.com (if implementing the middleware with RapidSec's Generated CSP:<br/>
+<img src="https://user-images.githubusercontent.com/3126207/109227786-8c3ef480-77c9-11eb-8315-c151deb05ebe.png" width="700"/>
 
-You can set any directives you wish. `defaultSrc` is required, but can be explicitly disabled by setting its value to `contentSecurityPolicy.dangerouslyDisableDefaultSrc`. Directives can be kebab-cased (like `script-src`) or camel-cased (like `scriptSrc`). They are equivalent, but duplicates are not allowed.
+## Use the CSP builder to generate your CSP based on the reports
+See your new CSP violations quickly from the menu bar and easily Allow or Dismiss them by CSP directive.
+Includes explanations on the meaning of each directive.
+<img src="https://user-images.githubusercontent.com/3126207/109228319-51898c00-77ca-11eb-8281-accdd1e94e0d.gif" width="700"/>
 
-The `reportOnly` option, if set to `true`, sets the `Content-Security-Policy-Report-Only` header instead.
+## Deploy versions of your CSP.
+Once you've allowed the appropriate assets, click "Build CSP", to generate a new version of your `content-security-policy`.<br/>
 
-This middleware does minimal validation. You should use a more sophisticated CSP validator, like [Google's CSP Evaluator](https://csp-evaluator.withgoogle.com/), to make sure your CSP looks good.
 
-## Recipe: generating nonces
 
-You can dynamically generate nonces to allow inline `<script>` tags to be safely evaluated. Here's a simple example:
+## See In-depth Analytics
+Explore your CSP reports. Dig into your data. Slice and dice by multiple parameters. Understand which assets / pages / browsers are generating CSP violations, and access a detailed report view.
+<img src="https://user-images.githubusercontent.com/3126207/109228314-4fbfc880-77ca-11eb-9c2a-603ac37d4b00.gif" width="700"/>
 
-```js
-const crypto = require("crypto");
+## Get Reports 
+Deployed your Report-Only CSP and now your users covered some additional flows with some additional browsers?<br/>
+You'll get an email with a summary of your new pending review CSP violations.
+<img src="https://user-images.githubusercontent.com/3126207/109228310-4e8e9b80-77ca-11eb-8394-9da0116cf021.png" width="700"/>
 
-app.use((req, res, next) => {
-  res.locals.nonce = crypto.randomBytes(16).toString("hex");
-  next();
-});
-
-app.use((req, res, next) => {
-  csp({
-    directives: {
-      defaultSrc: ["'self'"],
-      scriptSrc: ["'self'", `'nonce-${res.locals.nonce}'`],
-    },
-  })(req, res, next);
-});
-
-app.use((req, res) => {
-  res.end(`<script nonce="${res.locals.nonce}">alert(1 + 1);</script>`);
-});
-```
+## Note
+This Express middleware does minimal validation on the CSP integrity and quality, and relies that you're [generating proper CSPs via RapidSec].(https://rapidsec.com/csp-automation). If you choose to build your CSP manually - use a more sophisticated CSP validator, like [CSP Scanner](https://cspscanner.com/) to make sure your CSP is both valid, and effective at mitigating attacks. 
 
 ## See also
-
-- [Google's CSP Evaluator tool](https://csp-evaluator.withgoogle.com/)
+- [RapidSec CSP Generator](https://rapidsec.com/csp-automation)
 - [CSP Scanner](https://cspscanner.com/)
-- [GitHub's CSP journey](http://githubengineering.com/githubs-csp-journey/)
-- [Content Security Policy for Single Page Web Apps](https://developer.squareup.com/blog/content-security-policy-for-single-page-web-apps/)
-
+- [CSP Scanner Chrome Extension](https://chrome.google.com/webstore/detail/csp-scanner-test-analyze/eoiiiomeoogcpnkdedcodoeaacpdfmdj)
+- [CSP Bypasses](https://rapidsec.com/docs/csp-bypasses)
 
 ## Legal
-Original code from MIT licensed [Helmet-CSP](https://github.com/helmetjs/helmet/tree/main/middlewares/content-security-policy)
+Original code modified from MIT licensed [Helmet-CSP](https://github.com/helmetjs/helmet/tree/main/middlewares/content-security-policy)

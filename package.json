@@ -1,7 +1,7 @@
 {
   "name": "express-csp-generator",
-  "version": "1.0.1",
-  "description": "",
+  "version": "1.0.2",
+  "description": "Content-Security-Policy Generator, Running as an express middleware that integrates with RapidSec.",
   "main": "./lib/cjs/index.js",
   "module": "./lib/esm/index.js",
   "files": [
