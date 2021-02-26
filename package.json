@@ -16,7 +16,15 @@
     "type": "git",
     "url": "git+https://github.com/rapidsec-com/express-csp-generator.git"
   },
-  "keywords": [],
+  "keywords": [
+    "security",
+    "protection",
+    "csp",
+    "xss",
+    "clickjacking",
+    "formjacking",
+    "rapidsec"
+  ],
   "author": "",
   "license": "MIT",
   "bugs": {
