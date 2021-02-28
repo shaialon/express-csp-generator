@@ -19,6 +19,7 @@
   "keywords": [
     "security",
     "protection",
+    "content-security-policy",
     "csp",
     "xss",
     "clickjacking",
